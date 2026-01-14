@@ -1,0 +1,7 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title"
+    android:padding="20dp"
+    android:textSize="18sp"
+    android:textColor="#FFFFFF"
+    android:background="#202020"
+    android:focusable="true"/>

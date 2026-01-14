@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#000000"
+    android:padding="16dp">
+    <Button
+        android:id="@+id/btnChangeUrl"
+        android:text="Сменить источник"
+        android:focusable="true"/>
+</LinearLayout>
