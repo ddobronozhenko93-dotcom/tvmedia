@@ -1,16 +1,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="32dp" android:background="#101010">
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:background="#101010">
 
-    <TextView android:text="Источник контента"
-        android:textColor="#FFFFFF" android:textSize="22sp"/>
+    <TextView
+        android:text="Источник контента"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"/>
 
-    <EditText android:id="@+id/urlInput"
+    <EditText
+        android:id="@+id/urlInput"
         android:hint="https://site/movies.json"
         android:inputType="textUri"
         android:textColor="#FFFFFF"
-        android:hintTextColor="#888888"
+        android:textColorHint="#888888"
         android:background="#202020"/>
 
-    <Button android:id="@+id/saveBtn"
+    <Button
+        android:id="@+id/saveBtn"
         android:text="Сохранить"/>
 </LinearLayout>
+

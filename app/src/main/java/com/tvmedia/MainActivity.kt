@@ -15,9 +15,9 @@ class MainActivity : FragmentActivity() {
             return
         }
 
-        setContentView(android.R.layout.content)
         supportFragmentManager.beginTransaction()
             .replace(android.R.id.content, MainFragment())
             .commit()
     }
 }
+
