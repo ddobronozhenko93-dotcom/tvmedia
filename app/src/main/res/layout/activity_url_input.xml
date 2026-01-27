@@ -18,7 +18,7 @@
         android:id="@+id/urlInput"
         android:hint="https://example.com/data.json"
         android:textColor="#FFFFFF"
-        android:hintTextColor="#777777"
+        android:hintTextColor="#AAAAAA"
         android:inputType="textUri"
         android:layout_width="600dp"
         android:layout_height="wrap_content"/>
