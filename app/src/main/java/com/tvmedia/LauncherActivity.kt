@@ -1,10 +1,10 @@
 package com.tvmedia
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.fragment.app.FragmentActivity
 
-class LauncherActivity : Activity() {
+cclass LauncherActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -12,14 +12,11 @@ class LauncherActivity : Activity() {
         val url = UrlStorage.load(this)
 
         if (url.isNullOrBlank()) {
-            // Первый запуск — отправляем в настройки
-            startActivity(Intent(this, SettingsActivity::class.java))
+            startActivity(Intent(this, UrlInputActivity::class.java))
         } else {
-            // URL есть — запускаем основное приложение
             startActivity(Intent(this, MainActivity::class.java))
         }
 
         finish()
     }
 }
-
