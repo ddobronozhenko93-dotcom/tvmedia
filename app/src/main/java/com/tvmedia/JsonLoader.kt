@@ -8,14 +8,22 @@ import java.net.URL
 
 object JsonLoader {
 
-    fun load(context: Context): List<Category> {
-
-        // 1️⃣ Кеш
-        JsonCache.load(context)?.let {
+    fun load(context: Context, url: String?): List<Category> {
+        // кеш
+        JsonCache.read(context)?.let {
             return parse(it)
         }
 
-        // 2️⃣ fallback
+        // интернет
+        if (!url.isNullOrBlank()) {
+            try {
+                val text = URL(url).readText()
+                JsonCache.save(context, text)
+                return parse(text)
+            } catch (_: Exception) {}
+        }
+
+        // fallback
         return loadFromAssets(context)
     }
 
@@ -31,11 +39,10 @@ object JsonLoader {
                 val text = URL(url).readText()
                 JsonCache.save(context, text)
                 onUpdated(parse(text))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) {}
         }.start()
     }
+
     private fun loadFromAssets(context: Context): List<Category> {
         val text = context.assets.open("fallback.json")
             .bufferedReader()
@@ -58,7 +65,7 @@ object JsonLoader {
                 movies.add(
                     Movie(
                         title = m.getString("title"),
-                        poster = m.optString("poster").takeIf { it.isNotBlank() },
+                        poster = m.optString("poster"),
                         url = m.getString("url")
                     )
                 )
