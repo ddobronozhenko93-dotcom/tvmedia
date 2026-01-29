@@ -1,23 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:background="#101010">
-
-    <TextView
-        android:text="Источник контента"
-        android:textColor="#FFFFFF"
-        android:textSize="22sp"/>
-
-    <EditText
-        android:id="@+id/urlInput"
-        android:hint="https://site/movies.json"
-        android:inputType="textUri"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
-        android:background="#202020"/>
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:gravity="center">
 
     <Button
-        android:id="@+id/saveBtn"
-        android:text="Сохранить"/>
-</LinearLayout>
+        android:id="@+id/setUrlBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Задати URL"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+</FrameLayout>
 

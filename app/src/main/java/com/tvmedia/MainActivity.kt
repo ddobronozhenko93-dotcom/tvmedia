@@ -8,10 +8,10 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.loading)
+        setContentView(R.layout.activity_main)
 
         supportFragmentManager.beginTransaction()
-            .replace(android.R.id.content, MainFragment())
+            .replace(R.id.root, MainFragment())
             .commit()
     }
 }

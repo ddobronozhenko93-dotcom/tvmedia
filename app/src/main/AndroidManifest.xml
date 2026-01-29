@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Только Android TV -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
         android:label="TVMedia"
@@ -7,30 +12,27 @@
         android:banner="@drawable/banner"
         android:theme="@style/Theme.Leanback">
 
-        <!-- СТАРТОВЫЙ ЭКРАН -->
-<activity
-    android:name=".LauncherActivity"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
+        <!-- Стартовое Activity -->
+        <activity
+            android:name=".LauncherActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
-        <!-- ОБЯЗАТЕЛЬНО -->
-        <category android:name="android.intent.category.LAUNCHER"/>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
 
-        <!-- ДЛЯ ANDROID TV -->
-        <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
-    </intent-filter>
-</activity>
-
-        <activity android:name=".MainActivity"
-android:exported="false"/>
-        <activity android:name=".SettingsActivity"
-android:exported="false"/>
-<activity
-    android:name=".UrlInputActivity"
-    android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"/>
 
     </application>
 
 </manifest>
+
+
 

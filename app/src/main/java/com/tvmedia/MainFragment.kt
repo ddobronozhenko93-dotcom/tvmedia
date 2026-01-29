@@ -22,17 +22,23 @@ class MainFragment : BrowseSupportFragment() {
 
         val url = UrlStorage.load(requireContext())
 
-        // ⚡ мгновенный контент
+        // ⚡ мгновенный показ кеша / fallback
         val cached = JsonLoader.load(requireContext(), url)
         if (cached.isNotEmpty()) {
             setupRows(cached)
             showLoading(false)
         }
 
-        // 🔄 обновление
-        JsonLoader.refreshIfNeeded(requireContext(), url) {
-            activity?.runOnUiThread {
-                setupRows(it)
+        // 🔄 фоновое обновление
+        JsonLoader.refreshIfNeeded(requireContext(), url) { fresh ->
+            if (!isAdded) return@refreshIfNeeded
+
+            requireActivity().runOnUiThread {
+                if (fresh.isNotEmpty()) {
+                    setupRows(fresh)
+                } else {
+                    showErrorScreen("Контент недоступен")
+                }
                 showLoading(false)
             }
         }
@@ -41,22 +47,24 @@ class MainFragment : BrowseSupportFragment() {
     private fun setupRows(categories: List<Category>) {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 
-        // ⚙️ настройки
+        // ⚙️ НАСТРОЙКИ
         val settingsAdapter = ArrayObjectAdapter(CardPresenter())
         settingsAdapter.add(
             Movie(
                 title = "Сменить источник",
-                description = "Изменить URL",
+                poster = "" , // ← обязательно
                 url = SETTINGS_URL
             )
         )
         rowsAdapter.add(ListRow(HeaderItem("Настройки"), settingsAdapter))
 
-        // 📺 контент
+        // 📺 КОНТЕНТ
         categories.forEach { category ->
             if (category.items.isEmpty()) return@forEach
+
             val adapter = ArrayObjectAdapter(CardPresenter())
             category.items.forEach { adapter.add(it) }
+
             rowsAdapter.add(ListRow(HeaderItem(category.name), adapter))
         }
 
@@ -64,7 +72,8 @@ class MainFragment : BrowseSupportFragment() {
 
         onItemViewClickedListener =
             OnItemViewClickedListener { _, item, _, _ ->
-                val movie = item as Movie
+                val movie = item as? Movie ?: return@OnItemViewClickedListener
+
                 if (movie.url == SETTINGS_URL) {
                     startActivity(Intent(requireContext(), SettingsActivity::class.java))
                 } else {
@@ -94,7 +103,7 @@ class MainFragment : BrowseSupportFragment() {
         errorAdapter.add(
             Movie(
                 title = message,
-                description = "Нажмите, чтобы сменить источник",
+                poster = "",
                 url = SETTINGS_URL
             )
         )
