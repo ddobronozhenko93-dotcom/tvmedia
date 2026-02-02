@@ -14,9 +14,11 @@ object JsonCache {
             .apply()
     }
 
-    fun load(context: Context): String? {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    fun read(context: Context): String? {
+        return context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(KEY_DATA, null)
+            ?.takeIf { it.isNotBlank() }
     }
 
     fun clear(context: Context) {
@@ -26,4 +28,5 @@ object JsonCache {
             .apply()
     }
 }
+
 

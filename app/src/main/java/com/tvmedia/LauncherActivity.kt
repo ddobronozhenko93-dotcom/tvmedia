@@ -12,7 +12,7 @@ class LauncherActivity : Activity() {
         super.onCreate(savedInstanceState)
 
         // Пустой layout (обязательно для Android TV)
-        setContentView(android.R.layout.simple_list_item_1)
+           setContentView(R.layout.activity_launcher)
     }
 
     override fun onResume() {

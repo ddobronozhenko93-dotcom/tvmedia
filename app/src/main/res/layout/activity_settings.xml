@@ -9,8 +9,12 @@
         android:id="@+id/setUrlBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Задати URL"
+        android:minWidth="240dp"
+        android:minHeight="64dp"
+        android:text="Задати джерело"
+        android:textSize="18sp"
         android:focusable="true"
-        android:focusableInTouchMode="true"/>
+        android:focusableInTouchMode="true" />
+
 </FrameLayout>
 

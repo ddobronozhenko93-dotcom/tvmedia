@@ -1,32 +1,34 @@
-
 package com.tvmedia
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import org.json.JSONObject
+import java.net.HttpURLConnection
 import java.net.URL
-
 
 object JsonLoader {
 
+    /**
+     * ⚡ Быстрая загрузка:
+     * 1. Кеш
+     * 2. Assets (fallback)
+     * ❗ НИКАКОЙ сети здесь
+     */
     fun load(context: Context, url: String?): List<Category> {
         // кеш
         JsonCache.read(context)?.let {
             return parse(it)
         }
 
-        // интернет
-        if (!url.isNullOrBlank()) {
-            try {
-                val text = URL(url).readText()
-                JsonCache.save(context, text)
-                return parse(text)
-            } catch (_: Exception) {}
-        }
-
         // fallback
         return loadFromAssets(context)
     }
 
+    /**
+     * 🔄 Фоновое обновление контента
+     */
     fun refreshIfNeeded(
         context: Context,
         url: String?,
@@ -36,20 +38,53 @@ object JsonLoader {
 
         Thread {
             try {
-                val text = URL(url).readText()
+                val text = download(url)
                 JsonCache.save(context, text)
-                onUpdated(parse(text))
-            } catch (_: Exception) {}
+                val parsed = parse(text)
+
+                // ⬅ callback ВСЕГДА в UI-потоке
+                Handler(Looper.getMainLooper()).post {
+                    onUpdated(parsed)
+                }
+            } catch (e: Exception) {
+                Log.e("JsonLoader", "Refresh error", e)
+            }
         }.start()
     }
 
+    /**
+     * 📦 Fallback из assets
+     */
     private fun loadFromAssets(context: Context): List<Category> {
-        val text = context.assets.open("fallback.json")
-            .bufferedReader()
-            .use { it.readText() }
-        return parse(text)
+        return try {
+            val text = context.assets
+                .open("fallback.json")
+                .bufferedReader()
+                .use { it.readText() }
+            parse(text)
+        } catch (e: Exception) {
+            Log.e("JsonLoader", "Assets load error", e)
+            emptyList()
+        }
     }
 
+    /**
+     * 🌐 Скачивание JSON с таймаутами
+     */
+    private fun download(url: String): String {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.connectTimeout = 5000
+        connection.readTimeout = 5000
+        connection.requestMethod = "GET"
+
+        return connection.inputStream
+            .bufferedReader()
+            .use { it.readText() }
+    }
+
+    /**
+     * 🧠 Парсинг JSON
+     */
     private fun parse(text: String): List<Category> {
         val root = JSONObject(text)
         val cats = root.getJSONArray("categories")
@@ -70,7 +105,13 @@ object JsonLoader {
                     )
                 )
             }
-            result.add(Category(c.getString("name"), movies))
+
+            result.add(
+                Category(
+                    name = c.getString("name"),
+                    items = movies
+                )
+            )
         }
         return result
     }

@@ -17,7 +17,9 @@ class CardPresenter : Presenter() {
         val cardHeight = 450
 
         val container = FrameLayout(context).apply {
-            layoutParams = ViewGroup.LayoutParams(cardWidth, cardHeight)
+            layoutParams = ViewGroup.MarginLayoutParams(cardWidth, cardHeight).apply {
+    marginEnd = 16
+}
             isFocusable = true
             isFocusableInTouchMode = true
             clipToOutline = true
@@ -58,7 +60,7 @@ class CardPresenter : Presenter() {
         if (poster.isNullOrBlank()) {
             // 🧩 fallback-картинка
             imageView.setImageResource(R.drawable.ic_placeholder)
-            imageView.setBackgroundColor(Color.DKGRAY)
+            imageView.setBackgroundColor(Color.TRANSPARENT)
         } else {
             Glide.with(imageView.context)
                 .load(poster)

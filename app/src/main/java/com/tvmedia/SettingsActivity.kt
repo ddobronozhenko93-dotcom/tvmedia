@@ -3,10 +3,8 @@ package com.tvmedia
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
-
+import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -23,22 +21,24 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showUrlDialog() {
-        val input = EditText(this).apply {
-            hint = "https://example.com"
-            setSingleLine(true)
-        }
+        AlertDialog.Builder(this)
+            .setTitle("Выбор источника")
+            .setItems(
+                arrayOf(
+                    "Источник 1",
+                    "Источник 2"
+                )
+            ) { _, which ->
+                when (which) {
+                    0 -> UrlStorage.save(this, "https://example.com/1.json")
+                    1 -> UrlStorage.save(this, "https://example.com/2.json")
+                }
 
-AlertDialog.Builder(this)
-    .setTitle("Выбор источника")
-    .setItems(arrayOf("Источник 1", "Источник 2")) { _, which: Int ->
-        when (which) {
-            0 -> UrlStorage.save(this, "https://example.com/1.json")
-            1 -> UrlStorage.save(this, "https://example.com/2.json")
-        }
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+                openMain()
+            }
+            .setCancelable(true)
+            .show()
     }
-    .show()
 
     private fun openMain() {
         val intent = Intent(this, MainActivity::class.java).apply {
@@ -51,5 +51,6 @@ AlertDialog.Builder(this)
         finish()
     }
 }
+
 
 

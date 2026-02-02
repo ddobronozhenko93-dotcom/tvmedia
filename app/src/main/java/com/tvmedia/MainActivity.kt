@@ -13,7 +13,7 @@ class MainActivity : FragmentActivity() {
 
         supportFragmentManager.beginTransaction()
             .replace(android.R.id.content, MainFragment())
-            .commit()
+            .commitNow()
     }
 }
 
