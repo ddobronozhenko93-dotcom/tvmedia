@@ -12,7 +12,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.loading)
 
         supportFragmentManager.beginTransaction()
-            .replace(android.R.id.content, MainFragment())
+            .replace(R.id.main_container, MainFragment())
             .commitNow()
     }
 }

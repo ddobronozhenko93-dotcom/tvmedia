@@ -10,31 +10,32 @@
         android:name="android.hardware.touchscreen"
         android:required="false"/>
 
-    <application
-        android:allowBackup="false"
-        android:label="TVMedia"
-        android:icon="@mipmap/ic_launcher"
-        android:banner="@drawable/banner"
-        android:theme="@style/Theme.Leanback">
+ <application
+    android:allowBackup="false"
+    android:label="TVMedia"
+    android:icon="@mipmap/ic_launcher"
+    android:banner="@drawable/banner"
+    android:theme="@style/Theme.AppCompat.NoActionBar">
 
-        <activity
-            android:name=".LauncherActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
-            </intent-filter>
-        </activity>
+    <activity
+        android:name=".LauncherActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+        </intent-filter>
+    </activity>
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"/>
+    <activity
+        android:name=".MainActivity"
+        android:theme="@style/Theme.Leanback"
+        android:exported="false"/>
 
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"/>
+    <activity
+        android:name=".SettingsActivity"
+        android:exported="false"/>
+</application>
 
-    </application>
 
 </manifest>
 
