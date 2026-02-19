@@ -20,25 +20,24 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun showUrlDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Выбор источника")
-            .setItems(
-                arrayOf(
-                    "Источник 1",
-                    "Источник 2"
-                )
-            ) { _, which ->
-                when (which) {
-                    0 -> UrlStorage.save(this, "https://example.com/1.json")
-                    1 -> UrlStorage.save(this, "https://example.com/2.json")
-                }
+private fun showUrlDialog() {
+    val input = android.widget.EditText(this)
+    input.hint = "Введите URL JSON"
 
+    AlertDialog.Builder(this)
+        .setTitle("Введите источник")
+        .setView(input)
+        .setPositiveButton("Сохранить") { _, _ ->
+            val url = input.text.toString().trim()
+
+            if (url.startsWith("http")) {
+                UrlStorage.save(this, url)
                 openMain()
             }
-            .setCancelable(true)
-            .show()
-    }
+        }
+        .setNegativeButton("Отмена", null)
+        .show()
+}
 
     private fun openMain() {
         val intent = Intent(this, MainActivity::class.java).apply {

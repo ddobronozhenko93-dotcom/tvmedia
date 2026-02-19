@@ -18,30 +18,25 @@ class MainFragment : BrowseSupportFragment() {
         headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
 
-        showLoading(true)
-
         val url = UrlStorage.load(requireContext())
 
         // ⚡ мгновенный показ кеша / fallback
         val cached = JsonLoader.load(requireContext(), url)
         if (cached.isNotEmpty()) {
             setupRows(cached)
-            showLoading(false)
         }
 
         // 🔄 фоновое обновление
-        JsonLoader.refreshIfNeeded(requireContext(), url) { fresh ->
-            if (!isAdded) return@refreshIfNeeded
+JsonLoader.refreshIfNeeded(requireContext(), url) { fresh ->
+    if (!isAdded) return@refreshIfNeeded
 
-            requireActivity().runOnUiThread {
-                if (fresh.isNotEmpty()) {
-                    setupRows(fresh)
-                } else {
-                    showErrorScreen("Контент недоступен")
-                }
-                showLoading(false)
-            }
-        }
+    if (fresh.isNotEmpty()) {
+        setupRows(fresh)
+    } else {
+        showErrorScreen("Контент недоступен")
+    }
+}
+
     }
 
     private fun setupRows(categories: List<Category>) {
@@ -95,8 +90,6 @@ class MainFragment : BrowseSupportFragment() {
     }
 
     private fun showErrorScreen(message: String) {
-        showLoading(false)
-
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
         val errorAdapter = ArrayObjectAdapter(CardPresenter())
 
@@ -116,12 +109,6 @@ class MainFragment : BrowseSupportFragment() {
                 startActivity(Intent(requireContext(), SettingsActivity::class.java))
             }
     }
-
-    private fun showLoading(show: Boolean) {
-        activity?.findViewById<View>(R.id.progress)?.visibility =
-            if (show) View.VISIBLE else View.GONE
-    }
-}
 
 
 

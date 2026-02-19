@@ -12,22 +12,25 @@ object JsonLoader {
 
     /**
      * ⚡ Быстрая загрузка:
-     * 1. Кеш
-     * 2. Assets (fallback)
-     * ❗ НИКАКОЙ сети здесь
+     * 1. Кеш (если валидный)
+     * 2. Fallback из assets
      */
     fun load(context: Context, url: String?): List<Category> {
-        // кеш
-        JsonCache.read(context)?.let {
-            return parse(it)
-        }
+        return try {
+            JsonCache.read(context)?.let { cached ->
+                val parsed = parseSafely(cached)
+                if (parsed.isNotEmpty()) return parsed
+            }
 
-        // fallback
-        return loadFromAssets(context)
+            loadFromAssets(context)
+        } catch (e: Exception) {
+            Log.e("JsonLoader", "Load error", e)
+            loadFromAssets(context)
+        }
     }
 
     /**
-     * 🔄 Фоновое обновление контента
+     * 🔄 Фоновое обновление (никогда не ломает приложение)
      */
     fun refreshIfNeeded(
         context: Context,
@@ -39,13 +42,28 @@ object JsonLoader {
         Thread {
             try {
                 val text = download(url)
-                JsonCache.save(context, text)
-                val parsed = parse(text)
 
-                // ⬅ callback ВСЕГДА в UI-потоке
+                // Быстрая проверка — это вообще JSON?
+                if (!text.trim().startsWith("{")) {
+                    Log.e("JsonLoader", "Response is not JSON")
+                    return@Thread
+                }
+
+                val parsed = parseSafely(text)
+
+                // Если структура невалидная — не сохраняем
+                if (parsed.isEmpty()) {
+                    Log.e("JsonLoader", "Parsed empty or invalid structure")
+                    return@Thread
+                }
+
+                // Сохраняем только валидный JSON
+                JsonCache.save(context, text)
+
                 Handler(Looper.getMainLooper()).post {
                     onUpdated(parsed)
                 }
+
             } catch (e: Exception) {
                 Log.e("JsonLoader", "Refresh error", e)
             }
@@ -61,7 +79,8 @@ object JsonLoader {
                 .open("fallback.json")
                 .bufferedReader()
                 .use { it.readText() }
-            parse(text)
+
+            parseSafely(text)
         } catch (e: Exception) {
             Log.e("JsonLoader", "Assets load error", e)
             emptyList()
@@ -69,7 +88,7 @@ object JsonLoader {
     }
 
     /**
-     * 🌐 Скачивание JSON с таймаутами
+     * 🌐 Скачивание JSON
      */
     private fun download(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
@@ -83,37 +102,58 @@ object JsonLoader {
     }
 
     /**
-     * 🧠 Парсинг JSON
+     * 🛡 Безопасный парсинг
      */
-    private fun parse(text: String): List<Category> {
-        val root = JSONObject(text)
-        val cats = root.getJSONArray("categories")
-        val result = mutableListOf<Category>()
+    private fun parseSafely(text: String): List<Category> {
+        return try {
+            val root = JSONObject(text)
 
-        for (i in 0 until cats.length()) {
-            val c = cats.getJSONObject(i)
-            val items = c.getJSONArray("items")
-            val movies = mutableListOf<Movie>()
-
-            for (j in 0 until items.length()) {
-                val m = items.getJSONObject(j)
-                movies.add(
-                    Movie(
-                        title = m.getString("title"),
-                        poster = m.optString("poster"),
-                        url = m.getString("url")
-                    )
-                )
+            if (!root.has("categories")) {
+                Log.e("JsonLoader", "Missing 'categories'")
+                return emptyList()
             }
 
-            result.add(
-                Category(
-                    name = c.getString("name"),
-                    items = movies
-                )
-            )
+            val cats = root.getJSONArray("categories")
+            val result = mutableListOf<Category>()
+
+            for (i in 0 until cats.length()) {
+                val c = cats.getJSONObject(i)
+                val items = c.optJSONArray("items") ?: continue
+                val movies = mutableListOf<Movie>()
+
+                for (j in 0 until items.length()) {
+                    val m = items.getJSONObject(j)
+
+                    val title = m.optString("title", "")
+                    val url = m.optString("url", "")
+
+                    if (title.isBlank() || url.isBlank()) continue
+
+                    movies.add(
+                        Movie(
+                            title = title,
+                            poster = m.optString("poster"),
+                            url = url
+                        )
+                    )
+                }
+
+                if (movies.isNotEmpty()) {
+                    result.add(
+                        Category(
+                            name = c.optString("name", "Category"),
+                            items = movies
+                        )
+                    )
+                }
+            }
+
+            result
+        } catch (e: Exception) {
+            Log.e("JsonLoader", "Parse error", e)
+            emptyList()
         }
-        return result
     }
 }
+
 
