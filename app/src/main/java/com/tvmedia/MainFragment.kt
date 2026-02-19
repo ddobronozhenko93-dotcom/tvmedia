@@ -109,6 +109,7 @@ JsonLoader.refreshIfNeeded(requireContext(), url) { fresh ->
                 startActivity(Intent(requireContext(), SettingsActivity::class.java))
             }
     }
+}
 
 
 
